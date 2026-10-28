@@ -43,7 +43,7 @@ function addDepotLayers(map, L, depots, handleDepotClick) {
 
         depot.data.features.forEach((entry) => {
             const lineName = String(entry.properties.line);
-            const defaultOpacity = 0.1;
+            const defaultOpacity = 0.004 * Number(entry.properties.Count);
             const defaultWeight = 3;
             const layer = L.geoJSON(entry, {
                 pane: paneName,
