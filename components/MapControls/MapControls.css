@@ -1,0 +1,77 @@
+.menu-button {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    z-index: 1001;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 20px;
+    font-weight: 100;
+    color: var(--text-main);
+    cursor: pointer;
+    box-shadow: var(--glass-shadow);
+}
+
+.menu-button.active {
+    box-shadow: none;
+    background-color: unset;
+}
+
+.menu-button.active span {
+    display: none;
+}
+
+#toggleFilterBtn {
+    top: 10px;
+    left: 10px;
+}
+
+#toggleInfoBtn {
+    top: 10px;
+    right: 10px;
+}
+
+.menu-button.active #filterOpenIcon {
+    display: none;
+}
+
+.menu-button.active #filterCloseIcon {
+    display: flex;
+}
+
+.menu-button #filterCloseIcon {
+    display: none;
+}
+
+.reset-filter-btn {
+    display: none;
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: var(--glass-bg);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 8px;
+    align-items: center;
+}
+
+.reset-filter-btn:hover {
+    transform: translateX(-50%) scale(1.03);
+}
+
+.reset-filter-btn.visible {
+    display: flex;
+}

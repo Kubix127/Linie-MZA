@@ -1,0 +1,11 @@
+.header {
+    position: absolute;
+    top: 10px;
+    left: 50px;
+    z-index: 1000;
+    padding: 10px;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    font-weight: 700;
+}

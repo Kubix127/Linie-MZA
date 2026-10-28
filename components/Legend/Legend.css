@@ -1,0 +1,29 @@
+.legend-container {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 1000;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.legend {
+    max-width: 280px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 6px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.legend input[type="checkbox"] {
+    transform: scale(1.5);
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.legend label {
+    font-size: 15px;
+}
