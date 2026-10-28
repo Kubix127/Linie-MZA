@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Linie MZA</title>
-
+    <title>MZA – Mapa Zajezdni i Linii</title>
+    
     <!-- Leaflet CSS -->
     <link
         rel="stylesheet"
@@ -13,80 +13,79 @@
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossorigin=""
     />
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-    <style>
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-        }
-
-        #map {
-            width: 100%;
-            height: 100vh;
-        }
-
-        .header {
-            position: absolute;
-            top: 10px;
-            left: 50px;
-            z-index: 1000;
-            background: white;
-            padding: 10px;
-            border-radius: 6px;
-            box-shadow: 0 0 5px rgba(0,0,0,.3);
-        }
-
-
-	.leaflet-tooltip.zajezdnia-label {
-	    background: transparent;
-	    border: none;
-	    box-shadow: none;
-	    color: #000;
-	    font-weight: bold;
-	    font-size: 14px;
-	    padding: 0;
-	    text-shadow:
-	        -1px -1px 0 #fff,
-	         1px -1px 0 #fff,
-	        -1px  1px 0 #fff,
-	         1px  1px 0 #fff;
-	}
-
-	.leaflet-tooltip.zajezdnia-label::before {
-	    display: none;
-	}
-
-	.leaflet-popup-content-wrapper {
-	    background: transparent;
-	    box-shadow: none;
-	}
-
-	.leaflet-popup-tip {
-	    display: none;
-	}
-
-	.leaflet-popup-content {
-	    font-size: 16px;
-	    margin: 0;
-	    font-weight: bold;
-	    text-align: center;
-	    text-shadow:
-	        -1px -1px 0 #fff,
-	         1px -1px 0 #fff,
-	        -1px  1px 0 #fff,
-	         1px  1px 0 #fff;
-	}
-	
-     </style>
 </head>
 <body>
 
+<!-- Filter Menu Button -->
+<button id="toggleFilterBtn" class="menu-button" onclick="toggleFilterPanel()">
+    <span class="btn-icon">☰</span>
+    <span id="activeFiltersBadge" class="filters-badge" style="display: none;">0</span>
+</button>	
+
+
+<!-- Logo Header -->
 <div class="header">
     MZA Zajezdnie
 </div>
 
+<!-- Floating Reset Button -->
+<button id="resetLayersBtn" class="reset-filter-btn" onclick="resetActiveLayers()">
+    <span>Pokaż wszystkie zajezdnie</span>
+    <span>✕</span>
+</button>
+
+<!-- Depot Details Button -->
+<button id="toggleInfoBtn" class="menu-button" onclick="toggleInfoPanel()">
+    <span class="btn-icon">❮</span>
+</button>
+
+
+<!-- Map -->
 <div id="map"></div>
+
+
+<!-- Filter Panel -->
+
+
+<!-- Legend -->
+<div class="legend-container">
+    <div class="legend">
+        <b>Mapa zajezdni i tras</b><br>
+        - Kliknij ikonę zajezdni, aby wyświetlić szczegóły. Ponowne kliknięcie przywraca domyślny widok.<br>
+        - Większe natężenie koloru trasy oznacza większe natężenie tras autobusów.
+    </div>
+
+    <div class="legend">
+        <label>
+            <input
+                type="checkbox"
+                onchange="multiSelect = this.checked;"
+            >
+            Wybór wielu zajezdni
+        </label>
+    </div>
+</div>
+
+<!-- Map Options -->
+
+<!-- Depot Details Panel -->
+<div id="info-panel" class="info-panel">
+    <div class="banner">
+        <button class="close-btn" onclick="closePanel()">✕</button>
+
+        <h2 id="panel-title">Zajezdnia</h2>
+	    <div class="bottom-line"></div>
+    </div>
+
+    <div id="panel-content">
+        Wybierz zajezdnię na mapie.
+    </div>
+</div>
+
+
 
 <!-- Leaflet JS -->
 <script
@@ -102,7 +101,7 @@
 <script src="Data/Plochocinska.js"></script>
 
 <script>
-const zajezdnie = {
+const depots = {
     "R-1 Woronicza": {
         data: Woronicza,
         color: "#00A97B",
@@ -112,7 +111,21 @@ const zajezdnie = {
             iconSize: [32, 40],
             iconAnchor: [16, 32],
             popupAnchor: [0, -32]
-        })
+        }),
+        info: {
+            address: "ul. Woronicza 29",
+            description: "Największa zajezdnia autobusowa MZA.",
+            lines: [],
+            buses: {
+                "Solaris": 203,
+                "Solbus": 94,
+                "Ursus": 10,
+                "Yutong": 48,
+                "Elektryczne": 100,
+                "Nieelektryczne": 255
+            },
+            image: ""
+        }
     },
 
     "R-2 Kleszczowa": {
@@ -124,9 +137,23 @@ const zajezdnie = {
             iconSize: [32, 40],
             iconAnchor: [16, 32],
             popupAnchor: [0, -32]
-        })
+        }),
+        info: {
+            address: "ul. Kleszczowa 28",
+            description: "Oddział Przewozów R-2 Kleszczowa.",
+            lines: [],
+            buses: {
+                "Man": 110,
+                "Mercedes": 75,
+                "Scania": 29,
+                "Solaris": 111,
+                "Elektryczne": 62,
+                "Nieelektryczne": 263
+            },
+            image: ""
+        }
     },
-	
+
     "R-3 Ostrobramska": {
         data: Ostrobramska,
         color: "#0066FF",
@@ -136,7 +163,20 @@ const zajezdnie = {
             iconSize: [32, 40],
             iconAnchor: [16, 32],
             popupAnchor: [0, -32]
-        })
+        }),
+        info: {
+            address: "ul. Ostrobramska 38",
+            description: "Oddział Przewozów R-3 Ostrobramska.",
+            lines: [],
+            buses: {
+                "Autosan": 90,
+                "Solaris": 222,
+                "Solbus": 48,
+                "Elektryczne": 50,
+                "Nieelektryczne": 310
+            },
+            image: ""
+        }
     },
 
     "R-4 Stalowa": {
@@ -148,7 +188,20 @@ const zajezdnie = {
             iconSize: [32, 40],
             iconAnchor: [16, 32],
             popupAnchor: [0, -32]
-        })
+        }),
+        info: {
+            address: "ul. Stalowa 77",
+            description: "Oddział Przewozów R-4 Stalowa.",
+            lines: [],
+            buses: {
+                "Man": 70,
+                "Mercedes": 65,
+                "Solaris": 238,
+                "Elektryczne": 83,
+                "Nieelektryczne": 290
+            },
+            image: ""
+        }
     },
 
     "R-6 Płochocińska": {
@@ -160,109 +213,133 @@ const zajezdnie = {
             iconSize: [32, 40],
             iconAnchor: [16, 32],
             popupAnchor: [0, -32]
-        })
+        }),
+        info: {
+            address: "ul. Płochocińska 33",
+            description: "Oddział Przewozów R-6 Płochocińska.",
+            lines: [],
+            buses: {
+                "Solaris": 106,
+                "Nieelektryczne": 106
+            },
+            image: ""
+        }
     }
 };
 
-
-layers = {};
-shownLayer = "";
-
-// Wyświetlanie poszczególnych zajezdni
-function switchLayers(oddzial) {
-    if (shownLayer == oddzial) {
-	Object.keys(zajezdnie).forEach(name => {
-	    if (name != oddzial) {
-		showLayer(name);
-    	    }
-	});
-	shownLayer = "";
-	return;
-    }
-    Object.keys(zajezdnie).forEach(name => {
-	if (name == oddzial) {
-	    showLayer(name);
-    	    shownLayer = oddzial;
-	} else {
-	    hideLayer(name);
-	}
-    })
-}
-
-
-
-function showLayer(name) {
-    zajezdnie[name].layer.setStyle({
-	opacity: 0.1,
-    });
-}
-
-function hideLayer(name) {
-    zajezdnie[name].layer.setStyle({
-	opacity: 0,
-    });
-}
-
+let activeDepotLayers = new Set();
+let activePanel = false;
+let multiSelect = false;
+const busesSet = new Set();
 
 const bounds = [
-    [52.0, 20.60],
-    [52.44, 21.40]
+    [51.95, 20.50],
+    [52.53, 21.60]
 ];
 
 const map = L.map('map', {
     maxBounds: bounds,
     maxBoundsViscosity: 1.0,
-    renderer: L.canvas()
+    preferCanvas: true,
+    doubleClickZoom: false,
+    minZoom: 11,
+    zoomControl: false
 }).setView([52.2447, 21.0322], 12.4);
-
 
 // Podkład bez etykiet
 L.tileLayer(
     'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png?key=cb1_4qqs_1_79074f82560803ade70ccb5f',
     {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributor &copy; <a href="https://carto.com/attribution/">CARTO</a'
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attribution/">CARTO</a>'
     }
 ).addTo(map);
 
-// Etykiety
+// Etykiety 
 map.createPane('labels');
 map.getPane('labels').style.zIndex = 650;
 map.getPane('labels').style.pointerEvents = 'none';
 
 L.tileLayer(
     'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png?key=cb1_4qqs_1_79074f82560803ade70ccb5f', 
-    {
-        pane: 'labels'
-    }
+    { pane: 'labels' }
 ).addTo(map);
 
 
+// Pane Layers Creation
+Object.entries(depots).forEach(([name, depot], index) => {
+    const paneName = 'depot-pane-' + index;
+    map.createPane(paneName);
 
+    const paneElement = map.getPane(paneName);
+    paneElement.style.zIndex = 400 + index;
+    paneElement.classList.add('depot-routes-pane');
 
+    depot.paneName = paneName;
+    const renderer = L.canvas({ pane: paneName, padding: 0.5 });
+    depot.lines = [];
+    const linesSet = new Set();
 
-// Warstwy tras Zajezdni
-Object.entries(zajezdnie).forEach(([nazwa, zajezdnia]) => {
-    const marker = L.marker(zajezdnia.coords, {
-        icon: zajezdnia.icon
+    // Get Shape Counts for each line and depot
+    const lineShapeCounts = {};
+    depot.data.features.forEach((entry) => {
+	lineName = String(entry.properties.line);
+	lineShapeCounts[lineName] = (lineShapeCounts[lineName] || 0) + 1;
+    });
+
+    // Create a record of each lineLayer Object
+    depot.data.features.forEach((entry) => {    
+        const lineName = String(entry.properties.line);
+        const defaultOpacity = 0.004 * entry.properties.Count;
+        const defaultWeight = 3;
+        const filteredOpacity = 1 / (lineShapeCounts[lineName] || 1);
+
+        lineLayer = L.geoJSON(entry, {
+            pane: paneName,
+            renderer: renderer,
+            style: {
+                color: depot.color,
+                weight: defaultWeight,
+                opacity: defaultOpacity
+            }
+        }).addTo(map);
+	
+	const line = {
+	    name: lineName,
+	    layer: lineLayer,
+	    defaultOpacity: defaultOpacity,
+	    defaultWeight: defaultWeight,
+	    filteredOpacity: filteredOpacity
+	}
+
+        depot.lines.push(line);
+	linesSet.add(lineName);
+    });
+
+    // Sort unique depot lines
+    depot.info.lines = Array.from(linesSet).sort((a, b) => 
+       a.localeCompare(b, undefined, { numeric: true })
+    );
+
+    // Markery zajezdni
+    const marker = L.marker(depot.coords, {
+        icon: depot.icon
     }).addTo(map);
 
-    // Stały numer pod markerem
-    marker.bindTooltip(nazwa.split(" ")[0], {
+    marker.bindTooltip(name.split(" ")[0], {
         permanent: true,
         direction: "bottom",
         offset: [0, 0],
-        className: "zajezdnia-label"
+        className: "depot-label"
     });
 
-    // Nazwa po najechaniu
     marker.on("mouseover", function() {
-        this.bindPopup(nazwa.split(" ")[1], {
-	    closeButton: false,
+        this.bindPopup(name.split(" ")[1], {
+            closeButton: false,
             autoClose: false,
             closeOnClick: false,
             direction: "top",
             offset: [0, 22],
-            className: "zajezdnia-label"
+            className: "depot-label"
         }).openPopup();
     });
 
@@ -270,20 +347,213 @@ Object.entries(zajezdnie).forEach(([nazwa, zajezdnia]) => {
         this.closePopup();
     });
 
-    marker.on("click", () => switchLayers(nazwa));
-
-
-    zajezdnia.layer = L.geoJSON(zajezdnia.data, {
-        style: {
-            color: zajezdnia.color,
-            weight: 3,
-            opacity: 0.1
-        }
-    }).addTo(map);
+    marker.on("click", (e) => {
+        switchLayers(name, e.originalEvent.ctrlKey);
+	updatePanel(e.originalEvent.ctrlKey);
+    });
 });
 
+function switchLayers(depotName, ctrl) {    
+
+    // Add/Remove clicked Depot from active Layers
+    if (ctrl || multiSelect) {
+        if (activeDepotLayers.has(depotName)) {
+            activeDepotLayers.delete(depotName);
+        } else {
+            activeDepotLayers.add(depotName);
+        }
+    }
+
+    
+    if (!(ctrl || multiSelect)) {
+	// Activate only clicked Layer
+        if (activeDepotLayers.has(depotName) && activeDepotLayers.size == 1) {
+	    activeDepotLayers.delete(depotName);
+	} else {
+	    activeDepotLayers.clear();
+            activeDepotLayers.add(depotName);
+        }
+    }
+
+    // Show all depots if no active Layers and return
+    if (!activeDepotLayers.size) {
+	resetActiveLayers();
+	return;
+    }
+
+    // Show only active Layers
+    Object.keys(depots).forEach(name => {
+        if (activeDepotLayers.has(name)) {
+            showLayer(name);
+        } else {
+            hideLayer(name);
+        }
+    });
+    closePanel();
+    document.getElementById("resetLayersBtn").classList.add("visible");
+}
+
+function showLayer(name) {
+    const pane = map.getPane(depots[name].paneName);
+    if (pane) pane.classList.remove('pane-hidden');
+}
+
+function hideLayer(name) {
+    const pane = map.getPane(depots[name].paneName);
+    if (pane) pane.classList.add('pane-hidden');
+}
+
+function resetActiveLayers() {
+    // Reset Layers
+    Object.keys(depots).forEach(name => {
+        showLayer(name);
+    });
+    activeDepotLayers.clear();
+
+    // Hide Panel
+    closePanel();
+
+    // Hide reset button
+    document.getElementById("resetLayersBtn").classList.remove("visible");
+}
+
+function toggleActive(id) {
+     document.getElementById(id).classList.toggle("active");
+}
+
+function filterPanel() {
+    const allBuses = new Set();
+    const allLines = new Set();
+
+    Object.entity(depots).forEach(([name, depot]) => {
+	Object.keys(depot.info.buses).forEach((key) => allBuses.add(key));	
+	depot.info.lines.forEach((line) => allLines.add(line));
+    });
+    const sortedBuses = sortBuses(allBuses);
+    const sortedLines = sortLines(allLines);
+}
+
+
+function infoPanel() {
+if (activeDepotLayers.size == 0) {
+document.getElementById("panel-title").innerText = "Zajezdnia";
+document.getElementById("panel-content").innerHTML = "Wybierz zajezdnię na mapie.";
+
+
+}
+if (activeDepotLayers.size == 1) {
+    const name = activeDepotLayers.values().next().value;
+    const depot = depots[name];
+    const info = depot.info || { address: "-", description: "-", lines: "-", buses: "-", image: "" };
+
+    document.getElementById("panel-title").innerText = name;
+    document.getElementById("panel-content").innerHTML = `
+        <div class="info-card">
+            <div class="info-card-label">Lokalizacja</div>
+            <div class="info-card-value">${info.address}</div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-label">O oddziale</div>
+            <div class="info-card-value">${info.description}</div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-label">Autobusy</div>
+            <div class="info-card-value">
+		<ul>
+		    ${Object.entries(info.buses).map(([name, amount]) => {
+		        return(`<li>${name}: ${amount}</li>`)}).join("") || "-"
+	            }
+		</ul>
+	    </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-label">Obsługiwane linie</div>
+            <div class="line-container">${[...info.lines].map((line) => `<span class="line">${line}</span>`).join('')}</div>
+        </div>
+
+        ${info.image ? `<img src="${info.image}" class="panel-image" alt="Zajezdnia ${depotName}">` : ''}
+    `;
+
+
+}
+
+if (activeDepotLayers.size > 1) {
+    names = [];
+    buses = {};
+    lines = new Set();
+    
+    activeDepotLayers.forEach((depotName) => {
+	names.push(depotName);
+	Object.entries(depots[depotName].info.buses).forEach(([name, amount]) => {
+	    buses[name] = buses[name] || 0;
+	    buses[name] += amount;	    
+	})
+	lines = [...lines, ...depots[depotName].info.lines];
+    });
+    lines = sortLines(lines);
+    names.sort();
+    buses = sortBuses(buses);
+
+
+    document.getElementById("panel-title").innerText = names.join(",\n");
+    document.getElementById("panel-content").innerHTML = `
+        <div class="info-card">
+            <div class="info-card-label">Autobusy</div>
+            <div class="info-card-value">
+		<ul>
+		    ${Object.entries(buses).map(([name, amount]) => {
+		        return(`<li>${name}: ${amount}</li>`)}).join("") || "-"
+	            }
+		</ul>
+	    </div>
+        </div>
+
+        <div class="info-card">
+            <div class="info-card-label">Obsługiwane linie</div>
+            <div class="line-container">${[...lines].map((line) => `<span class="line">${line}</span>`).join('')}</div>
+        </div>
+    `;
+}
+
+}
+
+function updatePanel(ctrl) {
+    openPanel();
+    infoPanel();
+
+}
+
+function openPanel() {
+    document.getElementById("info-panel").classList.add("open");
+    activePanel = true;
+}
+
+function closePanel() {
+    document.getElementById("info-panel").classList.remove("open");
+    activePanel = false;
+}
+
+function sortBuses(buses) {
+    return Object.fromEntries(
+        Object.entries(buses)
+            .sort(([a], [b]) => {
+                const sa = ["Elektryczne", "Nieelektryczne"].includes(a);
+                const sb = ["Elektryczne", "Nieelektryczne"].includes(b);
+    
+                if (sa !== sb) return sa ? 1 : -1; // If "Elektryczne" or "Nieelektryczne", moved to the back
+    
+                return a.localeCompare(b, 'pl'); // Alphabetically
+            })
+    );
+}
+
+function sortLines(lines) {
+    return new Set(Array.from([...lines]).sort((a, b) => a.localeCompare(b, undefined, { numeric: true })));
+}
 </script>
 
 </body>
-
 </html>
