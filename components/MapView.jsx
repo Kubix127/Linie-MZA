@@ -2,8 +2,6 @@ const bounds = [
     [51.95, 20.50],
     [52.53, 21.60]
 ];
-const routesOpacity = 0.5;
-
 function addBaseLayers(map, L) {
     L.tileLayer(
         "https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png?key=cb1_4qqs_1_79074f82560803ade70ccb5f",
@@ -24,36 +22,46 @@ function addBaseLayers(map, L) {
 }
 
 function addDepotLayers(map, L, depots, handleDepotClick) {
-    const routesPane = map.createPane("routes-pane");
-    routesPane.style.zIndex = 400;
-    routesPane.style.opacity = String(routesOpacity);
-
     Object.entries(depots).forEach(([name, depot], index) => {
         const paneName = `depot-pane-${index}`;
-        map.createPane(paneName, routesPane);
+        map.createPane(paneName);
 
         const pane = map.getPane(paneName);
-        pane.style.zIndex = index;
+        pane.style.zIndex = 400 + index;
         pane.classList.add("depot-routes-pane");
         depot.paneName = paneName;
 
-        const renderer = L.svg({ pane: paneName, padding: 0.5 });
+        const renderer = L.canvas({ pane: paneName, padding: 0.5 });
+        const lineShapeCounts = {};
 
         depot.data.features.forEach((entry) => {
-            const defaultOpacity = Math.min(
-                1,
-                (0.004 * Number(entry.properties.Count)) / routesOpacity
-            );
+            const lineName = String(entry.properties.line);
+            lineShapeCounts[lineName] = (lineShapeCounts[lineName] || 0) + 1;
+        });
 
-            L.geoJSON(entry, {
+        depot.lines = [];
+
+        depot.data.features.forEach((entry) => {
+            const lineName = String(entry.properties.line);
+            const defaultOpacity = 0.1;
+            const defaultWeight = 3;
+            const layer = L.geoJSON(entry, {
                 pane: paneName,
                 renderer,
                 style: {
                     color: depot.color,
-                    weight: 3,
+                    weight: defaultWeight,
                     opacity: defaultOpacity
                 }
             }).addTo(map);
+
+            depot.lines.push({
+                name: lineName,
+                layer,
+                defaultOpacity,
+                defaultWeight,
+                filteredOpacity: 1 / lineShapeCounts[lineName]
+            });
         });
 
         const marker = L.marker(depot.coords, {
@@ -133,7 +141,7 @@ window.MZAComponents.MapView = function MapView({ depots, selectedDepots, multiS
         const map = L.map(mapElementRef.current, {
             maxBounds: bounds,
             maxBoundsViscosity: 1.0,
-            preferCanvas: false,
+            preferCanvas: true,
             doubleClickZoom: false,
             minZoom: 11,
             zoomControl: false
