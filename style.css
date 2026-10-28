@@ -1,0 +1,437 @@
+:root {
+    --mza-red: #D81E05;
+    --mza-red-dark: #A61300;
+    --mza-yellow: #F8BA00;
+    --text-main: #0F172A;
+    --text-muted: #64748B;
+    --glass-bg: rgba(255, 255, 255, 0.88);
+    --glass-border: rgba(255, 255, 255, 0.7);
+    --glass-shadow: 0 12px 32px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04);
+    --radius-lg: 16px;
+    --radius-md: 10px;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+#map {
+    width: 100%;
+    height: 100vh;
+}
+
+/* =============== Topside =============== */
+
+.menu-button {
+    width: 32px;
+    height: 32px;
+    position: absolute;
+    z-index: 1001;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    font-size: 20px;
+    font-weight: 100;
+    color: var(--text-main);
+    cursor: pointer;
+    box-shadow: var(--glass-shadow);
+}
+
+.menu-button.active {
+    box-shadow: none;
+    background-color: unset;
+}
+
+.menu-button.active span {
+   display: none;
+}
+
+#toggleFilterBtn {
+    top: 10px;
+    left: 10px;
+}
+
+#toggleInfoBtn {
+    top: 10px;
+    right: 10px;
+}
+
+.menu-button.active #filterOpenIcon {
+   display: none;
+}
+
+.menu-button.active #filterCloseIcon {
+   display: flex;
+}
+
+.menu-button #filterCloseIcon {
+   display: none;
+}
+
+
+
+.header {
+    position: absolute;
+    top: 10px;
+    left: 50px;
+    z-index: 1000;
+    padding: 10px;
+    background: #ffffff;
+    border-radius: 6px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    font-weight: 700;
+}
+
+/* Active Layers reset button */
+.reset-filter-btn {
+    display: none;
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: var(--glass-bg);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    gap: 8px;
+    align-items: center;
+}
+
+.reset-filter-btn:hover {
+    transform: translateX(-50%) scale(1.03);
+}
+
+.reset-filter-btn.visible {
+    display: flex;
+}
+
+
+.filter-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 2000;
+    width: var(--sidebar-width);
+    max-width: 90vw;
+    height: 100%;
+    background: var(--card-bg);
+    box-shadow: 6px 0 24px rgba(15, 23, 42, 0.12);
+    display: flex;
+    flex-direction: column;
+   /* transform: translateX(-100%);*/
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-panel.open {
+    transform: translateX(0);
+}
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 18px;
+    background: #ffffff;
+}
+
+.filter-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filter-title-wrap h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+
+.mza-badge {
+    background: var(--mza-red);
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.filter-close-btn {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.filter-close-btn:hover {
+    color: var(--text-main);
+    background: #f1f5f9;
+}
+
+.filter-divider {
+    height: 3px;
+    background: linear-gradient(90deg, var(--mza-red) 0%, var(--mza-yellow) 100%);
+}
+
+.filter-body {
+    padding: 16px 18px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    height: 100%;
+}
+
+.filter-actions-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.filter-stats {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.clear-filters-btn {
+    background: none;
+    border: none;
+    color: var(--mza-red);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 2px 4px;
+    transition: color 0.2s;
+}
+
+.clear-filters-btn:hover {
+    color: var(--mza-red-dark);
+    text-decoration: underline;
+}
+
+.filter-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 8px;
+}
+
+.filter-section-title {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.section-counter {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+
+
+/* Animacja przejścia tras */
+.leaflet-pane.depot-routes-pane {
+    transition: opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity;
+}
+
+.pane-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+/* Etykiety i popupy zajezdni na mapie */
+.leaflet-tooltip.depot-label,
+.leaflet-popup.depot-label {
+    padding: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    color: #000000;
+    font-size: 14px;
+    font-weight: 700;
+    text-shadow:
+        -1px -1px 0 #ffffff,
+         1px -1px 0 #ffffff,
+        -1px  1px 0 #ffffff,
+         1px  1px 0 #ffffff;
+}
+
+.leaflet-tooltip.depot-label::before {
+    display: none;
+}
+
+.leaflet-popup-content-wrapper {
+    background: transparent;
+    box-shadow: none;
+}
+
+.leaflet-popup-tip {
+    display: none;
+}
+
+.leaflet-popup-content {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    text-align: center;
+    text-shadow:
+        -1px -1px 0 #ffffff,
+         1px -1px 0 #ffffff,
+        -1px  1px 0 #ffffff,
+         1px  1px 0 #ffffff;
+}
+
+/* Legenda */
+.legend-container {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 1000;
+
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.legend {
+    max-width: 280px;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 6px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.legend input[type="checkbox"] {
+    transform: scale(1.5);
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.legend label {
+    font-size: 15px;
+}
+
+/* Panel boczny zajezdni */
+.info-panel {
+    position: fixed;
+    top: 0;
+    right: -400px;
+    z-index: 2000;
+    box-sizing: border-box;
+    width: 350px;
+    height: 100%;
+    overflow-y: auto;
+    background: #ffffff;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
+    font-size: 14px;
+    transition: right 0.3s ease;
+}
+
+.info-panel.open {
+    right: 0;
+}
+
+.banner {
+    position: relative;
+    top: 0;
+    background: linear-gradient(135deg, var(--mza-red), #930F00);
+    color: #ffffff;
+}
+
+.close-btn {
+    float: right;
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.bottom-line {
+    width: 100%;
+    height: 4px;
+    background-color: var(--mza-yellow);
+}
+
+#panel-title {
+    margin: 0;
+    padding: 30px 22px;
+}
+
+#panel-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 22px;
+}
+
+/* Karty informacyjne wewnątrz panelu */
+.info-card {
+    padding: 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-md);
+}
+
+.info-card-label {
+    margin-bottom: 6px;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.info-card-value {
+    color: var(--text-main);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.line-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 6px 0;
+}
+
+.line {
+    width: 23px;
+    padding: 4px 6px;
+    background: #ffffff;
+    border: 1.5px solid #cbd5e1;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    color: var(--text-main);
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+}
