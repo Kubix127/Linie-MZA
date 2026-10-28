@@ -2,6 +2,7 @@ const bounds = [
     [51.95, 20.50],
     [52.53, 21.60]
 ];
+const routesOpacity = 0.5;
 
 function addBaseLayers(map, L) {
     L.tileLayer(
@@ -23,19 +24,26 @@ function addBaseLayers(map, L) {
 }
 
 function addDepotLayers(map, L, depots, handleDepotClick) {
+    const routesPane = map.createPane("routes-pane");
+    routesPane.style.zIndex = 400;
+    routesPane.style.opacity = String(routesOpacity);
+
     Object.entries(depots).forEach(([name, depot], index) => {
         const paneName = `depot-pane-${index}`;
-        map.createPane(paneName);
+        map.createPane(paneName, routesPane);
 
         const pane = map.getPane(paneName);
-        pane.style.zIndex = 400 + index;
+        pane.style.zIndex = index;
         pane.classList.add("depot-routes-pane");
         depot.paneName = paneName;
 
         const renderer = L.svg({ pane: paneName, padding: 0.5 });
 
         depot.data.features.forEach((entry) => {
-            const defaultOpacity = 0.004 * entry.properties.Count;
+            const defaultOpacity = Math.min(
+                1,
+                (0.004 * Number(entry.properties.Count)) / routesOpacity
+            );
 
             L.geoJSON(entry, {
                 pane: paneName,
