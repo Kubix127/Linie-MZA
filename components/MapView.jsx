@@ -32,7 +32,7 @@ function addDepotLayers(map, L, depots, handleDepotClick) {
         pane.classList.add("depot-routes-pane");
         depot.paneName = paneName;
 
-        const renderer = L.canvas({ pane: paneName, padding: 0.5 });
+        const renderer = L.svg({ pane: paneName, padding: 0.5 });
 
         depot.data.features.forEach((entry) => {
             const defaultOpacity = 0.004 * entry.properties.Count;
@@ -125,7 +125,7 @@ window.MZAComponents.MapView = function MapView({ depots, selectedDepots, multiS
         const map = L.map(mapElementRef.current, {
             maxBounds: bounds,
             maxBoundsViscosity: 1.0,
-            preferCanvas: true,
+            preferCanvas: false,
             doubleClickZoom: false,
             minZoom: 11,
             zoomControl: false
