@@ -72,6 +72,7 @@ function addDepotLayers(map, L, depots, handleDepotClick) {
                 popupAnchor: [0, -32]
             })
         }).addTo(map);
+        depot.marker = marker;
 
         marker.bindTooltip(name.split(" ")[0], {
             permanent: true,
@@ -101,9 +102,9 @@ function addDepotLayers(map, L, depots, handleDepotClick) {
     });
 }
 
-function selectDepot(currentSelection, depotName, useMultiSelect) {
-    if (useMultiSelect) {
-        const nextSelection = new Set(currentSelection);
+function selectDepot(depots, depotName, multiSelect) {
+    if (multiSelect) {
+        const nextSelection = new Set(depots);
 
         if (nextSelection.has(depotName)) {
             nextSelection.delete(depotName);
@@ -114,7 +115,7 @@ function selectDepot(currentSelection, depotName, useMultiSelect) {
         return nextSelection;
     }
 
-    if (currentSelection.size === 1 && currentSelection.has(depotName)) {
+    if (depots.size === 1 && depots.has(depotName)) {
         return new Set();
     }
 
@@ -123,7 +124,14 @@ function selectDepot(currentSelection, depotName, useMultiSelect) {
 
 window.MZAComponents = window.MZAComponents || {};
 
-window.MZAComponents.MapView = function MapView({ depots, selectedDepots, multiSelect, onSelectionChange }) {
+window.MZAComponents.MapView = function MapView({
+    depots,
+    selectedDepots,
+    filteredBuses,
+    filteredLines,
+    multiSelect,
+    onSelectionChange
+}) {
     const mapElementRef = React.useRef(null);
     const mapRef = React.useRef(null);
     const depotsRef = React.useRef(depots);
@@ -175,13 +183,40 @@ window.MZAComponents.MapView = function MapView({ depots, selectedDepots, multiS
         };
 
         Object.entries(depotsRef.current).forEach(([name, depot]) => {
-            const pane = map.getPane(depot.paneName);
+            const matchesBusFilter = filteredBuses.length === 0
+                || filteredBuses.some((bus) => bus in depot.info.buses);
+            const matchesLineFilter = filteredLines.length === 0
+                || filteredLines.some((line) => depot.info.lines.includes(line));
+            const showDepot = matchesBusFilter && matchesLineFilter;
 
-            if (pane) {
-                pane.classList.toggle("pane-hidden", selectedDepots.length > 0 && !selectedDepots.includes(name));
+            if (showDepot) {
+                if (!map.hasLayer(depot.marker)) {
+                    depot.marker.addTo(map);
+                }
+            } else if (map.hasLayer(depot.marker)) {
+                map.removeLayer(depot.marker);
+                onSelectionChangeRef.current(new Set([...selectedRef.current].filter((depotName) => depotName !== name)));
             }
+
+            depot.lines.forEach((line) => {
+                const matchesDepotSelection = selectedDepots.length === 0 || selectedDepots.includes(name);
+                const matchesSelectedLines = filteredLines.length === 0 || filteredLines.includes(line.name);
+                const showLine = matchesBusFilter && matchesDepotSelection && matchesSelectedLines;
+
+                line.layer.setStyle({
+                    opacity: filteredLines.length > 0 ? line.filteredOpacity : line.defaultOpacity
+                });
+
+                if (showLine) {
+                    if (!map.hasLayer(line.layer)) {
+                        line.layer.addTo(map);
+                    }
+                } else if (map.hasLayer(line.layer)) {
+                    map.removeLayer(line.layer);
+                }
+            });
         });
-    }, [selectedDepots]);
+    }, [selectedDepots, filteredBuses, filteredLines]);
 
     return <div id="map" ref={mapElementRef} />;
 }

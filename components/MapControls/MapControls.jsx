@@ -4,9 +4,11 @@ window.MZAComponents.MapControls = function MapControls({
     hasSelection,
     multiSelect,
     isInfoPanelOpen,
+    isFilterPanelOpen,
     onToggleMultiSelect,
     onReset,
-    onToggleInfoPanel
+    onToggleInfoPanel,
+    onToggleFilterPanel
 }) {
     return (
         <>
@@ -14,10 +16,10 @@ window.MZAComponents.MapControls = function MapControls({
                 id="toggleFilterBtn"
                 className="menu-button"
                 type="button"
-                title="Włącz lub wyłącz wybór wielu zajezdni"
-                aria-label="Włącz lub wyłącz wybór wielu zajezdni"
-                aria-pressed={multiSelect}
-                onClick={onToggleMultiSelect}
+                title="Filtrowanie"
+                aria-label="Filtrowanie"
+                aria-pressed={isFilterPanelOpen}
+                onClick={onToggleFilterPanel}
             >
                 <span className="btn-icon">☰</span>
             </button>

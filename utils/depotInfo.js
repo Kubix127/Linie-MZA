@@ -21,18 +21,30 @@ window.MZA.sortLines = function sortLines(lines) {
     );
 };
 
-window.MZA.summarizeDepots = function summarizeDepots(depotNames, depots) {
+window.MZA.summarizeDepots = function summarizeDepots(depots, depotNames=[]) {
+    console.log(depots);
     const buses = {};
     const lines = [];
 
-    depotNames.forEach((name) => {
-        const info = depots[name].info;
+    if (depotNames.length !== 0) {
+        depotNames.forEach((name) => {
+            const info = depots[name].info;
 
-        Object.entries(info.buses).forEach(([bus, amount]) => {
-            buses[bus] = (buses[bus] || 0) + amount;
+            Object.entries(info.buses).forEach(([bus, amount]) => {
+                buses[bus] = (buses[bus] || 0) + amount;
+            });
+            lines.push(...info.lines);
         });
-        lines.push(...info.lines);
-    });
+    } else {
+        Object.entries(depots).forEach(([name, depot]) => {
+            const info = depot.info;
+
+            Object.entries(info.buses).forEach(([bus, amount]) => {
+                buses[bus] = (buses[bus] || 0) + amount;
+            });
+            lines.push(...info.lines);
+        });
+    }
 
     return {
         title: depotNames.slice().sort().join(", "),

@@ -1,7 +1,10 @@
 .info-panel {
-    position: fixed;
-    top: 0;
     right: -400px;
+}
+
+.panel {
+    top: 0;
+    position: fixed;
     z-index: 2000;
     box-sizing: border-box;
     width: 350px;
@@ -10,7 +13,7 @@
     background: #ffffff;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.3);
     font-size: 14px;
-    transition: right 0.3s ease;
+    transition: left 0.3s ease, right 0.3s ease;
 }
 
 .info-panel.open {
@@ -25,12 +28,17 @@
 }
 
 .close-btn {
-    float: right;
+    position: absolute;
     background: none;
     border: none;
     color: #ffffff;
     font-size: 20px;
     cursor: pointer;
+}
+
+#info-panel-close-btn {
+    top: 10px;
+    right: 10px;
 }
 
 .bottom-line {
@@ -51,44 +59,4 @@
     padding: 22px;
 }
 
-.info-card {
-    padding: 14px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: var(--radius-md);
-}
 
-.info-card-label {
-    margin-bottom: 6px;
-    color: var(--text-muted);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.6px;
-    text-transform: uppercase;
-}
-
-.info-card-value {
-    color: var(--text-main);
-    font-size: 14px;
-    line-height: 1.5;
-}
-
-.line-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin: 6px 0;
-}
-
-.line {
-    width: 23px;
-    padding: 4px 6px;
-    background: #ffffff;
-    border: 1.5px solid #cbd5e1;
-    border-radius: 6px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    color: var(--text-main);
-    font-size: 11px;
-    font-weight: 700;
-    text-align: center;
-}
