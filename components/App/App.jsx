@@ -29,8 +29,13 @@ window.MZAComponents.App = function App() {
     }
 
     function handleLineFilterChange(nextFilteredLines) {
+        // if (nextFilteredLines.length === 0) {
+        //     setSelectedDepots([]);
+        // } //else {
+        //     setSelectedDepots(window.MZA.filterDepots(depots, filteredBuses, nextFilteredLines));
+        // }
         setFilteredLines(nextFilteredLines);
-        setSelectedDepots(window.MZA.filterDepots(depots, filteredBuses, nextFilteredLines));
+        
     }
 
     return (
@@ -76,7 +81,7 @@ window.MZAComponents.App = function App() {
                     depots={depots}
                     selectedDepots={selectedDepots}
                     filteredLines={filteredLines}
-                    onLineFilterChange={handleLineFilterChange}
+                    onLineFilterChange={setFilteredLines}
                     onResetFilters={resetLayers}
                     filtersResetDisabled={selectedDepots.length === 0}
                     isOpen={isInfoPanelOpen}

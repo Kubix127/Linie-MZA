@@ -82,6 +82,13 @@ window.MZAComponents.Legend = function Legend({ isVisible = true, onClose }) {
             )
         }
     ];
+
+    React.useEffect(() => {
+        if (!isVisible) {
+            setCurrentPage(0);
+        }
+    }, [isVisible]);
+
     if (!isVisible) {
         return null;
     }
@@ -105,7 +112,7 @@ window.MZAComponents.Legend = function Legend({ isVisible = true, onClose }) {
                         aria-label="Poprzednia strona"
                         onClick={currentPage > 0 ? () => setCurrentPage(currentPage - 1) : null}
                     >
-                        <window.MZAComponents.Icon name="chevronLeft" size={16} />
+                        <window.MZAComponents.Icon name="chevronLeft" size={20} />
                     </button>
                     <button
                         className={`menu-button interactive-control ${currentPage < pages.length - 1 ? "active" : ""}`}
@@ -114,7 +121,7 @@ window.MZAComponents.Legend = function Legend({ isVisible = true, onClose }) {
                         aria-label="Następna strona"
                         onClick={currentPage < pages.length - 1 ? () => setCurrentPage(currentPage + 1) : null}
                     >
-                        <window.MZAComponents.Icon name="chevronRight" size={16} />
+                        <window.MZAComponents.Icon name="chevronRight" size={20} />
                     </button>
                 </div>
             </div>

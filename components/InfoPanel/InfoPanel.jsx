@@ -130,6 +130,7 @@ window.MZAComponents.InfoPanel = function InfoPanel({
             id="info-panel"
             className={`panel info-panel${isOpen ? " open" : ""}`}
             aria-hidden={!isOpen}
+            inert={isOpen ? undefined : ""}
         >
             <div className="banner">
                                 <window.MZAComponents.CloseButton
