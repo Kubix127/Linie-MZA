@@ -1,29 +1,76 @@
 .legend-container {
     position: absolute;
-    bottom: 10px;
-    left: 10px;
+    bottom: 0;
+    left: 0;
     z-index: 1000;
     display: flex;
     gap: 10px;
+    margin: 10px;
     align-items: flex-end;
 }
 
 .legend {
-    max-width: 280px;
-    padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 6px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    min-width: 300px;
+    padding: 14px 16px;
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-floating);
     font-size: 13px;
     line-height: 1.4;
 }
 
-.legend input[type="checkbox"] {
-    transform: scale(1.5);
-    margin-right: 8px;
-    cursor: pointer;
+.legend-title {
+    color: var(--text-main);
 }
 
-.legend label {
-    font-size: 15px;
+.legend-title b {
+    padding-top: 3px;
+}
+
+.legend-title .icon {
+    color: var(--mza-red);
+}
+
+.legend p {
+    margin: 8px 0 0;
+    color: var(--text-muted);
+}
+
+.legend .close-btn {
+    top: 4px;
+    right: 4px;
+}
+
+.legend-footer {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 12px;
+}
+
+.legend-footer .menu-button {
+    border: none;
+    background: none;
+    padding: 0;
+    min-height: 0;
+}
+
+.legend-footer .menu-button:not(.active) {
+    visibility: hidden;
+}
+
+
+@media (max-width: 520px) {
+    .legend-container {
+        right: 10px;
+    }
+
+    .legend {
+        max-width: 250px;
+        font-size: 12px;
+    }
 }

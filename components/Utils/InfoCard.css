@@ -1,21 +1,102 @@
-.info-card {
-    padding: 14px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: var(--radius-md);
+.info-card-label,
+.legend-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
 }
 
 .info-card-label {
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     color: var(--text-muted);
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.6px;
     text-transform: uppercase;
+}
+
+.info-card-label .icon {
+    scale: 1.5;
+    color: var(--mza-red);
 }
 
 .info-card-value {
     color: var(--text-main);
     font-size: 14px;
     line-height: 1.5;
+}
+
+.line-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background-color: var(--bg-color);
+    gap: 6px;
+    max-height: 400px;
+    padding: 6px;
+    margin: 6px 0;
+    overflow-y: auto;
+}
+
+.bus-container {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-content: center;
+    gap: 8px;
+}
+
+.badge {
+    padding: 4px 6px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 7px;
+    background-color: #ffffff;
+    color: var(--text-main);
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.badge-line,
+.badge-bus {
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.badge-line {
+    width: 30px;
+}
+
+.badge-bus {
+    display: inline-flex;
+    align-items: center;
+    background: var(--bg-color);
+    gap: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    
+}
+
+.badge-line:hover,
+.badge-bus:hover {
+    border-color: var(--mza-red-dark);
+}
+
+.badge-line.selected {
+    border-color: var(--mza-red);
+    background: var(--mza-red);
+    color: #ffffff;
+}
+
+.badge-line.selected:hover {
+    border-color: var(--mza-red-dark);
+    background: var(--mza-red-dark);
+}
+
+.badge-bus input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--mza-red);
+    cursor: pointer;
 }

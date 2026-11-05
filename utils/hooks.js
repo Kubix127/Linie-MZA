@@ -1,10 +1,9 @@
 window.MZA = window.MZA || {};
 
-window.MZA.handleListSelection = function handleListSelection(setState, item) {
-    setState((prev) => {
-        if (prev.includes(item)) {
-            return prev.filter((i) => i !== item);
-        }
-        return [...prev, item];
-    });
+window.MZA.toggleListSelection = function toggleListSelection(items, item) {
+    if (items.includes(item)) {
+        return items.filter((selectedItem) => selectedItem !== item);
+    }
+
+    return [...items, item];
 };

@@ -8,15 +8,14 @@ window.MZAComponents.App = function App() {
     const [multiSelect, setMultiSelect] = React.useState(false);
     const [isInfoPanelOpen, setInfoPanelOpen] = React.useState(false);
     const [isFilterPanelOpen, setFilterPanelOpen] = React.useState(false);
+    const [isLegendVisible, setLegendVisible] = React.useState(true);
 
     function handleSelectionChange(nextSelection) {
         setSelectedDepots(Array.from(nextSelection));
-        setInfoPanelOpen(nextSelection.size > 0);
     }
 
     function resetLayers() {
         setSelectedDepots([]);
-        setInfoPanelOpen(false);
     }
 
     function resetFilters() {
@@ -24,47 +23,66 @@ window.MZAComponents.App = function App() {
         setFilteredLines([]);
     }
 
+    function handleBusFilterChange(nextFilteredBuses) {
+        setFilteredBuses(nextFilteredBuses);
+        setSelectedDepots(window.MZA.filterDepots(depots, nextFilteredBuses, filteredLines));
+    }
+
+    function handleLineFilterChange(nextFilteredLines) {
+        setFilteredLines(nextFilteredLines);
+        setSelectedDepots(window.MZA.filterDepots(depots, filteredBuses, nextFilteredLines));
+    }
 
     return (
-        <>
-            <window.MZAComponents.MapView
-                depots={depots}
-                selectedDepots={selectedDepots}
-                filteredBuses={filteredBuses}
-                filteredLines={filteredLines}
-                multiSelect={multiSelect}
-                onSelectionChange={handleSelectionChange}
-            />
-            <window.MZAComponents.MapControls
-                hasSelection={selectedDepots.length > 0}
-                multiSelect={multiSelect}
+        <div className="layout">
+            <window.MZAComponents.Header 
                 isInfoPanelOpen={isInfoPanelOpen}
-                isFilterPanelOpen={isFilterPanelOpen}
-                onToggleMultiSelect={() => setMultiSelect((value) => !value)}
-                onReset={resetLayers}
                 onToggleInfoPanel={() => setInfoPanelOpen((value) => !value)}
+                isFilterPanelOpen={isFilterPanelOpen}
                 onToggleFilterPanel={() => setFilterPanelOpen((value) => !value)}
+                multiSelect={multiSelect} 
+                onMultiSelectChange={setMultiSelect} 
+                isLegendVisible={isLegendVisible}
+                onToggleLegend={() => setLegendVisible((value) => !value)}
             />
-            <window.MZAComponents.Header />
-            <window.MZAComponents.FilterPanel 
-                depots={depots}
-                onBusFilterChange={setFilteredBuses}
-                filteredBuses={filteredBuses}
-                onLineFilterChange={setFilteredLines}
-                filteredLines={filteredLines}
-                onResetFilters={resetFilters}
-                isOpen={isFilterPanelOpen}
-                onClose={() => setFilterPanelOpen(false)}
-            />
-            <window.MZAComponents.Legend multiSelect={multiSelect} onMultiSelectChange={setMultiSelect} />
-            <window.MZAComponents.InfoPanel
-                depots={depots}
-                selectedDepots={selectedDepots}
-                filteredLines={filteredLines}
-                onLineFilterChange={setFilteredLines}
-                isOpen={isInfoPanelOpen}
-                onClose={() => setInfoPanelOpen(false)}
-            />
-        </>
+            <div className="map-container">
+                <window.MZAComponents.MapView
+                    depots={depots}
+                    selectedDepots={selectedDepots}
+                    filteredBuses={filteredBuses}
+                    filteredLines={filteredLines}
+                    multiSelect={multiSelect}
+                    onSelectionChange={handleSelectionChange}
+                />
+                <window.MZAComponents.MapControls
+                    hasSelection={selectedDepots.length > 0}
+                    onReset={() => { resetLayers(); resetFilters(); }}
+                />
+                <window.MZAComponents.FilterPanel
+                    depots={depots}
+                    onBusFilterChange={handleBusFilterChange}
+                    filteredBuses={filteredBuses}
+                    onLineFilterChange={handleLineFilterChange}
+                    filteredLines={filteredLines}
+                    onResetFilters={resetFilters}
+                    isOpen={isFilterPanelOpen}
+                    onClose={() => setFilterPanelOpen(false)}
+                />
+                <window.MZAComponents.Legend
+                    isVisible={isLegendVisible}
+                    onClose={() => setLegendVisible(false)}
+                />
+                <window.MZAComponents.InfoPanel
+                    depots={depots}
+                    selectedDepots={selectedDepots}
+                    filteredLines={filteredLines}
+                    onLineFilterChange={handleLineFilterChange}
+                    onResetFilters={resetLayers}
+                    filtersResetDisabled={selectedDepots.length === 0}
+                    isOpen={isInfoPanelOpen}
+                    onClose={() => setInfoPanelOpen(false)}
+                />
+            </div>
+        </div>
     );
 };

@@ -1,11 +1,125 @@
 .header {
-    position: absolute;
-    top: 10px;
-    left: 50px;
-    z-index: 1000;
-    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    z-index: 3000;
+    box-sizing: border-box;
+    min-height: 60px;
+    padding: 8px 16px;
+    border-bottom: 1px solid var(--border-color);
     background: #ffffff;
-    border-radius: 6px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 10px;
+}
+
+.header-content.right {
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 6px;
+    color: var(--text-main);
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.35px;
+    white-space: nowrap;
+}
+
+.brand-mark {
+    color: var(--mza-red);
+}
+
+.menu-button,
+.selection-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-sizing: border-box;
+    min-height: 38px;
+    padding: 0 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    background: #ffffff;
+    color: var(--text-main);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.menu-button {
+    z-index: 1001;
+    cursor: pointer;
+}
+
+.menu-button:hover,
+.selection-toggle:hover {
+    border-color: #b8c2ce;
+    background: #f8fafc;
+}
+
+.menu-button[aria-pressed="true"] .icon {
+    color: var(--mza-red);
+}
+
+.selection-toggle {
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.selection-toggle input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--mza-red);
+}
+
+@media (max-width: 810px) {
+    .selection-toggle .selection-label {
+        display: none;
+    }
+}
+@media (max-width: 720px) {
+    .header {
+        gap: 6px;
+        padding: 8px 10px;
+    }
+
+    .header-content {
+        gap: 4px;
+    }
+
+    .menu-button,
+    .selection-toggle {
+        padding: 0 9px;
+    }
+
+    .menu-label,
+    .selection-label {
+        display: none;
+    }
+}
+
+@media (max-width: 440px) {
+    .brand-name {
+        display: none;
+    }
+
+    .menu-button,
+    .selection-toggle {
+        min-height: 36px;
+        padding: 0 7px;
+    }
 }

@@ -7,9 +7,9 @@ function BusList({ buses }) {
             {Object.entries(buses).map(([name, amount]) => (
                 <label
                     key={name}
-                    className="badge badge-bus"
+                    className={`badge badge-bus ${busTypes.includes(name) ? "grid-cell-2" : ""}`}
                 >
-                    {name} ({amount})
+                    {name}: {amount}
                 </label>
             ))}
         </div>
@@ -23,7 +23,7 @@ function LineList({ lines, filteredLines, onLineFilterChange }) {
                 <span
                     className={`badge badge-line${filteredLines.includes(line) ? " selected" : ""}`}
                     key={line}
-                    onClick={() => window.MZA.handleListSelection(onLineFilterChange, line)}
+                    onClick={() => onLineFilterChange(window.MZA.toggleListSelection(filteredLines, line))}
                 >
                     {line}
                 </span>
@@ -32,15 +32,40 @@ function LineList({ lines, filteredLines, onLineFilterChange }) {
     );
 }
 
-function DepotDetails({ depot, filteredLines, onLineFilterChange }) {
+function DepotDetails({ depot, filteredLines, onLineFilterChange, onResetFilters, filtersResetDisabled }) {
     const { info } = depot;
 
     return (
         <>
-            <window.MZAComponents.InfoCard label="Lokalizacja">{info.address}</window.MZAComponents.InfoCard>
-            <window.MZAComponents.InfoCard label="O oddziale">{info.description}</window.MZAComponents.InfoCard>
-            <window.MZAComponents.InfoCard label={`Autobusy - (${Object.entries(info.buses).filter(([name]) => !["Elektryczne", "Nieelektryczne"].includes(name)).reduce((sum, [_, value]) => sum + value, 0)})`}><BusList buses={info.buses} /></window.MZAComponents.InfoCard>
-            <window.MZAComponents.InfoCard label={`Obsługiwane linie - (${info.lines.length})`}><LineList lines={info.lines} filteredLines={filteredLines} onLineFilterChange={onLineFilterChange} /></window.MZAComponents.InfoCard>
+            <window.MZAComponents.ResetButton
+                onReset={onResetFilters}
+                disabled={filtersResetDisabled}
+                label="Wyczyść wybrane zajezdnie"
+            />
+            <hr/>
+            <window.MZAComponents.InfoCard 
+                label={
+                    `Autobusy - 
+                        ${Object.entries(info.buses)
+                        .filter(([name]) => !busTypes.includes(name))
+                        .reduce((sum, [_, value]) => sum + value, 0)}
+                    `
+                } 
+                icon="bus"
+            >
+                <BusList buses={info.buses} />
+            </window.MZAComponents.InfoCard>
+            <hr/>
+            <window.MZAComponents.InfoCard 
+                label={`Obsługiwane linie - ${info.lines.length}`} 
+                icon="route"
+            >
+                <LineList 
+                    lines={info.lines} 
+                    filteredLines={filteredLines}  
+                    onLineFilterChange={onLineFilterChange} 
+                />
+            </window.MZAComponents.InfoCard>
             {info.image && (
                 <img
                     src={info.image}
@@ -52,27 +77,52 @@ function DepotDetails({ depot, filteredLines, onLineFilterChange }) {
     );
 }
 
-function CombinedDepotDetails({ summary, filteredLines, onLineFilterChange }) {
+function CombinedDepotDetails({ summary, filteredLines, onLineFilterChange, onResetFilters, filtersResetDisabled }) {
     return (
         <>
-            <window.MZAComponents.InfoCard label="Autobusy"><BusList buses={summary.buses} /></window.MZAComponents.InfoCard>
-            <window.MZAComponents.InfoCard label="Obsługiwane linie"><LineList lines={summary.lines} filteredLines={filteredLines} onLineFilterChange={onLineFilterChange} /></window.MZAComponents.InfoCard>
+            <window.MZAComponents.ResetButton
+                onReset={onResetFilters}
+                disabled={filtersResetDisabled}
+                label="Wyczyść wybrane zajezdnie"
+            />
+            <window.MZAComponents.InfoCard label="Autobusy" icon="bus"><BusList buses={summary.buses} /></window.MZAComponents.InfoCard>
+            <window.MZAComponents.InfoCard label="Obsługiwane linie" icon="route"><LineList lines={summary.lines} filteredLines={filteredLines} onLineFilterChange={onLineFilterChange} /></window.MZAComponents.InfoCard>
         </>
     );
 }
 
-window.MZAComponents.InfoPanel = function InfoPanel({ depots, selectedDepots, filteredLines, onLineFilterChange, isOpen, onClose }) {
+window.MZAComponents.InfoPanel = function InfoPanel({
+    depots,
+    selectedDepots,
+    filteredLines,
+    onLineFilterChange,
+    onResetFilters,
+    filtersResetDisabled,
+    isOpen,
+    onClose
+}) {
     let title = "Zajezdnia";
-    let content = "Wybierz zajezdnię na mapie.";
+    let content = 
+        <span className="panel-text">
+            Wybierz zajezdnię na mapie.
+        </span>;
 
     if (selectedDepots.length === 1) {
         const depot = depots[selectedDepots[0]];
         title = depot.name;
-        content = <DepotDetails depot={depot} filteredLines={filteredLines} onLineFilterChange={onLineFilterChange} />;
+        content = (
+            <DepotDetails
+                depot={depot}
+                filteredLines={filteredLines}
+                onLineFilterChange={onLineFilterChange}
+                onResetFilters={onResetFilters}
+                filtersResetDisabled={filtersResetDisabled}
+            />
+        );
     } else if (selectedDepots.length > 1) {
         const summary = window.MZA.summarizeDepots(depots, selectedDepots);
         title = summary.title;
-        content = <CombinedDepotDetails summary={summary} filteredLines={filteredLines} onLineFilterChange={onLineFilterChange} />;
+        content = <CombinedDepotDetails summary={summary} filteredLines={filteredLines} onLineFilterChange={onLineFilterChange} onResetFilters={onResetFilters} filtersResetDisabled={filtersResetDisabled} />;
     };
 
     return (
@@ -82,13 +132,16 @@ window.MZAComponents.InfoPanel = function InfoPanel({ depots, selectedDepots, fi
             aria-hidden={!isOpen}
         >
             <div className="banner">
-                <button id="info-panel-close-btn" className="close-btn" type="button" onClick={onClose} aria-label="Zamknij panel">
-                    ✕
-                </button>
-                <h2 id="panel-title">{title}</h2>
-                <div className="bottom-line" />
+                                <window.MZAComponents.CloseButton
+                    onClose={onClose}
+                />
+                <div className="panel-heading">
+                    <window.MZAComponents.Icon name="depot" size={22} />
+                    <h2 className="panel-title">{title}</h2>
+                </div>
+                <div className="bottom-line right" />
             </div>
-            <div id="panel-content">{content}</div>
+            <div className="panel-content">{content}</div>
         </div>
     );
 }

@@ -3,8 +3,8 @@ window.MZA = window.MZA || {};
 window.MZA.sortBuses = function sortBuses(buses) {
     return Object.fromEntries(
         Object.entries(buses).sort(([a], [b]) => {
-            const aIsElectricCategory = ["Elektryczne", "Nieelektryczne"].includes(a);
-            const bIsElectricCategory = ["Elektryczne", "Nieelektryczne"].includes(b);
+            const aIsElectricCategory = busTypes.includes(a);
+            const bIsElectricCategory = busTypes.includes(b);
 
             if (aIsElectricCategory !== bIsElectricCategory) {
                 return aIsElectricCategory ? 1 : -1;
@@ -21,8 +21,20 @@ window.MZA.sortLines = function sortLines(lines) {
     );
 };
 
+window.MZA.filterDepots = function filterDepots(depots, filteredBuses, filteredLines) {
+    return Object.entries(depots)
+        .filter(([, depot]) => {
+            const matchesBusFilter = filteredBuses.length === 0
+                || filteredBuses.some((bus) => bus in depot.info.buses);
+            const matchesLineFilter = filteredLines.length === 0
+                || filteredLines.some((line) => depot.info.lines.includes(line));
+
+            return matchesBusFilter && matchesLineFilter;
+        })
+        .map(([name]) => name);
+};
+
 window.MZA.summarizeDepots = function summarizeDepots(depots, depotNames=[]) {
-    console.log(depots);
     const buses = {};
     const lines = [];
 

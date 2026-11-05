@@ -29,7 +29,6 @@ function addDepotLayers(map, L, depots, handleDepotClick) {
         const pane = map.getPane(paneName);
         pane.style.zIndex = 400 + index;
         pane.classList.add("depot-routes-pane");
-        depot.paneName = paneName;
 
         const renderer = L.canvas({ pane: paneName, padding: 0.5 });
         const lineShapeCounts = {};
@@ -44,13 +43,12 @@ function addDepotLayers(map, L, depots, handleDepotClick) {
         depot.data.features.forEach((entry) => {
             const lineName = String(entry.properties.line);
             const defaultOpacity = 0.004 * Number(entry.properties.Count);
-            const defaultWeight = 3;
             const layer = L.geoJSON(entry, {
                 pane: paneName,
                 renderer,
                 style: {
                     color: depot.color,
-                    weight: defaultWeight,
+                    weight: 3,
                     opacity: defaultOpacity
                 }
             }).addTo(map);
@@ -59,7 +57,6 @@ function addDepotLayers(map, L, depots, handleDepotClick) {
                 name: lineName,
                 layer,
                 defaultOpacity,
-                defaultWeight,
                 filteredOpacity: 1 / lineShapeCounts[lineName]
             });
         });
@@ -182,12 +179,14 @@ window.MZAComponents.MapView = function MapView({
             return;
         };
 
+        const matchingDepots = new Set(
+            window.MZA.filterDepots(depotsRef.current, filteredBuses, filteredLines)
+        );
+
         Object.entries(depotsRef.current).forEach(([name, depot]) => {
             const matchesBusFilter = filteredBuses.length === 0
                 || filteredBuses.some((bus) => bus in depot.info.buses);
-            const matchesLineFilter = filteredLines.length === 0
-                || filteredLines.some((line) => depot.info.lines.includes(line));
-            const showDepot = matchesBusFilter && matchesLineFilter;
+            const showDepot = matchingDepots.has(name);
 
             if (showDepot) {
                 if (!map.hasLayer(depot.marker)) {
@@ -195,7 +194,6 @@ window.MZAComponents.MapView = function MapView({
                 }
             } else if (map.hasLayer(depot.marker)) {
                 map.removeLayer(depot.marker);
-                onSelectionChangeRef.current(new Set([...selectedRef.current].filter((depotName) => depotName !== name)));
             }
 
             depot.lines.forEach((line) => {

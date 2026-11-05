@@ -1,0 +1,1 @@
+busTypes = ["Elektryczne", "Nieelektryczne"];
